@@ -1,0 +1,233 @@
+---
+title: "Tutorial 1: R Markdown"
+author: "Daria Kuznetsova, University of Canterbury"
+purpose: "This R Markdown file introduces R Markdown and shows simple plots using ggplot library"
+output:
+  html_document: default
+  pdf_document: default
+date modified: null
+date created: "2024-11-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button, a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. If echo is set to TRUE as `echo = TRUE`, than the output will look like this:
+
+```{r pressure2, echo=TRUE}
+plot(pressure)
+```
+
+## More about RMarkdown 
+
+As you can see, it is much easier to leave comments in RMarkdown file than in R script. Although R scripts are usefull and are still commonly used, RMarkdown files provide us with a better interface for the purposes of this class. Using R Markdown, we can write own annotated code for data visualisations, provide descriptions, and generate professionally looking output files as pdf, html, or word documents. RMarkdown file will be our default option for this class. You will submit your problem sets by inlcuding RMarkdown file and a PDF created with it. 
+
+For a very comprehensive list of capabilities of RMarkdown see this cheatsheet
+https://rstudio.github.io/cheatsheets/rmarkdown.pdf
+
+## Anscombe's Quartet
+
+Now, let's make our first visualisation! RStudio and its libraries provide built-in datasets that we will use in addition to other data. Let's explore some of the options. To view all the datasets available we need to run the function `data()`.
+
+```{r built-in data}
+data()
+```
+
+Let's use dataset "anscombe" that contains the Anscombe's Quartet of 'Identical' Simple Linear Regressions. We saw these data visualised during our first lecture in class. But, before we continue, we need to load tidyverse library.
+
+```{r library, echo = T, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r anscombe1, echo=TRUE}
+data("anscombe")
+anscombe
+summary(anscombe)
+p1 <- ggplot(data = anscombe, mapping = aes(x = x1, y = y1)) + # specify your data, x and y variables
+      geom_point() +                                           # choose geometry to plot
+      geom_smooth(method='lm', se = FALSE) +                   # adding linear trend
+      labs(x = "x1", y = "y1",
+        title = "Dataset 1" )                                  # adding axes labels and a title for our graph
+
+p1
+```
+
+You just made your first graph with ggplot! Let's break down the syntax.
+
+Now, let's create scatterplots (this is the type of plots we are making) for datasets 2, 3, and 4.
+
+```{r anscombe2, echo=TRUE}
+p2 <- ggplot(data = anscombe, mapping = aes(x = x2, y = y2)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      labs(x = "x2", y = "y2",
+        title = "Dataset 2" ) 
+
+p3 <- ggplot(data = anscombe, mapping = aes(x = x3, y = y3)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      labs(x = "x3", y = "y3",
+        title = "Dataset 3" )
+
+p4 <- ggplot(data = anscombe, mapping = aes(x = x4, y = y4)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      labs(x = "x4", y = "y4",
+        title = "Dataset 4" )
+```
+
+You will notice that this code does not produce any graphs. This is because we assigned graphs to objects `p2` `p3` and `p4`, but did not call these objects. Now, let's combine our plots together. We will need to install package `patchwork` to combine our plots. Don't forget to load the library after you install it. 
+
+```{r combine, echo=TRUE, warning=FALSE, message=FALSE}
+#install.packages("patchwork")
+library(patchwork)
+p1+p2+p3+p4 +
+  plot_layout(ncol = 2)
+```
+
+Do you like how these graphs look? What can we improve? 
+
+```{r refined, echo=TRUE, warning=FALSE, message=FALSE}
+p1 <- ggplot(data = anscombe, mapping = aes(x = x1, y = y1)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      coord_cartesian(xlim = c(4, 20), ylim = c(4, 13)) + 
+      theme(aspect.ratio = 1) +
+      labs(x = "x1", y = "y1",
+        title = "Dataset 1" )
+
+p2 <- ggplot(data = anscombe, mapping = aes(x = x2, y = y2)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      coord_cartesian(xlim = c(4, 20), ylim = c(4, 13)) +
+      theme(aspect.ratio = 1) +
+      labs(x = "x2", y = "y2",
+        title = "Dataset 2" ) 
+
+p3 <- ggplot(data = anscombe, mapping = aes(x = x3, y = y3)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      coord_cartesian(xlim = c(4, 20), ylim = c(4, 13)) +
+      theme(aspect.ratio = 1) +
+      labs(x = "x3", y = "y3",
+        title = "Dataset 3" )
+
+p4 <- ggplot(data = anscombe, mapping = aes(x = x4, y = y4)) +
+      geom_point() +
+      geom_smooth(method='lm', se = FALSE) +
+      coord_cartesian(xlim = c(4, 20), ylim = c(4, 13)) +
+      theme(aspect.ratio = 1) +
+      labs(x = "x4", y = "y4",
+        title = "Dataset 4" )
+
+p1+p2+p3+p4 +
+  plot_layout(ncol = 2)
+```
+
+
+This looks better: the axes are consistent, and each graph is now a square. 
+
+## NZ population data
+
+Next, let's plot New Zealand population data. First, we need to load and explore our data. 
+
+```{r nz_pop, echo=TRUE }
+nz_pop <- read_csv("NZ STAT population estimates.csv") # load our data
+nz_pop_2023 <- select(nz_pop, Area, `2023`) # select two columns to keep: region names and data for year 2023 
+# column names should not start with numeric symbols. But, for the sake of an example, we will go with it. 
+# We can # enclose 2023 in `` to select that column
+nz_pop_2023 <- nz_pop_2023[2:18,] # keep values for regions only, remove total and totals for islands
+```
+
+
+Looks good! Now, our dataset has total population for each region in New Zealand in 2023. Let's plot it. What type of a graph would you choose? 
+
+I will plot a bar chart.
+
+```{r nz_pop_2023, echo=TRUE }
+plot_nz <- ggplot(nz_pop_2023, aes(Area, `2023`)) +
+          geom_col() 
+
+plot_nz
+
+```
+
+How does this look?
+
+```{r nz_pop_2, echo=TRUE }
+plot_nz2 <- ggplot(nz_pop_2023, aes(y = Area, x = `2023`)) +
+            geom_col()
+
+plot_nz2
+
+# a bit more improvements
+
+plot_nz3 <- ggplot(nz_pop_2023, aes(y = reorder(Area, `2023`), x = `2023`)) + # reorder function 
+                                                                              # helps to order the bars
+            geom_col() +
+            labs(x = "", y = "Region",
+              title = "Population in NZ regions in 2023" ) +
+            theme_minimal()                                                   # trying minimal theme instead of a default (theme_gray())
+
+plot_nz3
+
+```
+
+# Now, your turn!
+
+1. Create a new R Markdown file and provide a file description.
+2. Load ggplot2 library.
+3. Using `data("iris")` command load Iris data.
+4. Explore the dataset.
+5. Create a simple scatterplot of the data using `geom_point()` function.
+5. Create scatterplot #2 using the same `geom_point()` function and adding a linear trend.
+6. Create scatterplot #3 by adding color to the scatterplot #2 to differentiate between species by adding `color = Species` into aes parentheses. Do not forget to add a comma. 
+7. Display plots 2 and 3 together side by side, similarly to the example with Anscombe's quartet above.
+8. What else would you change in this graph? 
+9. Knit you RMarkdown file into a pdf and check your work. Make sure that all your code is included in the file with the images. 
+
+
+```{r iris}
+library(ggplot2)
+data("iris")
+#iris
+
+iris1 <- ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width)) +
+      geom_point()
+
+iris2 <- ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width)) +
+      geom_point()  +
+      geom_smooth(method="lm", se=F)
+
+
+iris3 <- ggplot(data = iris, mapping = aes(x = Petal.Length, 
+                                  y = Petal.Width, 
+                                  color = Species)) +
+      geom_point() +
+      geom_smooth(method="lm", se=F)
+
+iris2+iris3
+
+```
+

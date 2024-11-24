@@ -1,0 +1,160 @@
+---
+title: "Problem Set 1: Create data visuals focusing on NZ population data and summarising guidelines for better data visualisations"
+author: "Joan Claire Teves"
+output: html_document
+date: "2024-11-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading libraries and NZ population data
+
+## Load libraries
+
+```{r library, echo = T, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+#install.packages("patchwork")
+library(patchwork)
+
+```
+
+## Load NZ population from problem set files
+
+```{r nz_pop, echo = T, warning=FALSE, message=FALSE}
+nz_pop <- read_csv("NZ STAT population estimates.csv") # load our data
+nz_pop <- nz_pop[2:18,]
+
+```
+
+# New Zealand population in 2000
+
+Plot a horizontal bar chart based on Tutorial 1. This will include the population by region on the year 2020.
+
+## Extracting and plotting 2020 data
+
+```{r nz_pop_2020, echo=TRUE }
+nz_pop_2020 <- select(nz_pop, Area, `2020`) 
+
+plot_nz_2020 <- ggplot(nz_pop_2020, aes(y = reorder(Area, `2020`), x = `2020`)) + 
+            geom_col() +
+            labs(x = "Region", y = "Population",
+            title = "Population in NZ regions in 2020" ) +
+            theme_classic()                                                 
+
+plot_nz_2020
+```
+
+### 4th Highest population in 2020
+
+Population 2020 data show that the Waikato region has the 4th highest population.
+
+```{r 4th_highest, echo=TRUE}
+nz_pop_2020 <- arrange(nz_pop_2020,desc(`2020`))
+nz_pop_2020
+
+```
+
+## Extracting and plotting 2023 data
+
+```{r nz_pop_2023, echo=TRUE}
+nz_pop_2023 <- select(nz_pop, Area,'2023')
+
+plot_nz_2023 <- ggplot(nz_pop_2023, aes(y = reorder(Area, `2023`), x = `2023`)) +  
+                geom_col() +
+                labs(x = "Population", y = "Region",
+                  title = "Population in NZ regions in 2023" ) +
+                theme_classic()                                                   
+
+plot_nz_2023
+
+```
+
+## Graphing 2020 and 2023 visual side by side
+Plotting the data side by side as shown below make it very difficult to grasp
+population change over time. Therefore for a better data visualizations I will 
+use the 5 guidelines for better data visualizations. 
+
+```{r side_by_side , echo=TRUE, warning=FALSE, message=FALSE}
+c_2020 <- ggplot(nz_pop_2020, mapping = aes(y = reorder(Area, `2020`), x = `2020`)) + 
+            geom_col() +
+            labs(x = "Population", y = "Region",
+            title = "Population in NZ regions in 2020" ) +
+            theme_classic() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1,size= 6),
+                  axis.text.y = element_text(size = 6),                        
+                  axis.title = element_text(size = 6),                       
+                  plot.title = element_text(size = 6),                        
+                  aspect.ratio = 1
+                  )
+
+
+c_2023 <- ggplot(nz_pop_2023, mapping = aes(y = reorder(Area, `2023`), x = `2023`)) + # reorder function 
+                                                                            
+            geom_col() +
+            labs(x = "Population", y = "Region",
+            title = "Population in NZ regions in 2023" ) +
+            theme_classic() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1,size = 6 ),
+                          axis.text.y = element_text(size = 6),                        
+                          axis.title = element_text(size = 6),                       
+                          plot.title = element_text(size = 6),                       
+                          aspect.ratio = 1
+                  )
+
+
+c_2020 +
+    c_2023 + plot_layout(ncol = 2)
+
+```
+
+# Summary of 5 primary guidelines for better data visualizations
+
+The 5 guidelines outlined in Chapter 2 from “Better Data Visualizations: A Guide for Scholars, Researchers, and Wonks” by Schwabish, Jonathan A.
+
+## 1.Show the data:
+
+It is important the viewer is able to grasp the meaning of data being displayed. Highlight data that conveys the purpose of the visual best, without necessarily showing all the data.
+
+## 2. Reduce the clutter:
+
+The viewers are able to decode the meaning of the visual better by having as less cognitive load as possible. Therefore while it is important for the visual to be engaging reducing distracting elements that can distort the viewers perception is important.
+
+## 3. Integrate the graphics and text:
+
+It is important the data visuals have in-context annotations. Integrating active titles and details to the data increases the viewers understanding of the visual.
+
+## 4. Avoid the spaghetti chart:
+
+Visual with too much information is can be taxing to understand for viewers. Instead of packing everything into 1 graph consider breaking the data into multiple visuals.
+
+## 5. Start with grey:
+
+Starting with grey visual forces the creator to be more purposeful with how colors are used to highlight important data.
+
+# Improved graph
+From this improved graph the viewers is able to see the population comparison 
+between the 2020 and 2023. However for improvement, the labels would need to change
+as aligning the bar with the x-axis makes it hard to specifically know the population 
+of each region. To improve I would add a dynamic feature that shows that population
+when the viewer hovers on the bar. 
+
+```{r new_graph, echo=TRUE}
+# Reshape data 
+nz_pop_new <- data.frame(
+  Area = rep(nz_pop$Area, 2),  
+  Year = rep(c('2020', '2023'), each = nrow(nz_pop)),  
+  Population = c(nz_pop$`2020`, nz_pop$`2023`) 
+)
+
+# Plot combined graph
+combined <- ggplot(nz_pop_new, aes(y = reorder(Area, Population), x = Population, fill = Year)) +
+    geom_col(position = 'dodge')+
+    labs(x = "Population", y = "Region", title = "Population growth in NZ regions (2020 vs 2023)") +
+    scale_fill_manual(values = c("2020" = "blue", "2023" = "red")) +  
+    theme_classic()
+combined     
+
+```
