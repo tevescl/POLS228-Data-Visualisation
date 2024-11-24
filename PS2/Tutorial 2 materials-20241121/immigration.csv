@@ -1,0 +1,17 @@
+value,n,freq,var
+Disagree,86,8.1,fills_jobs
+Hard to say,355,33.6,fills_jobs
+Agree,575,54.4,fills_jobs
+No response,41,3.9,fills_jobs
+Disagree,71,6.7,cult_div
+Hard to say,217,20.5,cult_div
+Agree,733,69.3,cult_div
+No response,36,3.4,cult_div
+Disagree,443,41.9,crime
+Hard to say,441,41.7,crime
+Agree,135,12.8,crime
+No response,38,3.6,crime
+Disagree,90,8.5,refugee
+Hard to say,332,31.4,refugee
+Agree,593,56.1,refugee
+No response,42,4,refugee
