@@ -1,0 +1,118 @@
+---
+title: "Teves"
+output: html_document
+date: "2024-11-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading libraries and immigration data
+
+```{r library, echo = T}
+# load libraries
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(patchwork)
+
+immigration <- read_csv("immigration.csv") 
+immigration
+
+```
+
+## 1. Responses to immigration questions from WVS
+
+```{r plots, echo = T}
+# Ensure the 'value' column is a factor with ordered levels
+immigration$value <- factor(immigration$value, levels = c("Agree", "Disagree", "Hard to say", "No response"))
+
+# Separate data for plotting
+agree_disagree <- immigration %>% filter(value %in% c("Agree", "Disagree"))
+hard_to_say <- immigration %>% filter(value == "Hard to say")
+no_response <- immigration %>% filter(value == "No response")
+# Plot1: Divergent bar chart for "Agree" and "Disagree"
+plot1 <- ggplot(agree_disagree, aes(x = var, y = ifelse(value == "Agree", freq, -freq), fill = value)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_y_continuous(labels = abs) +
+  labs(
+    title = "Agree vs Disagree",
+    x = "Statements",
+    y = "Percentage",
+    fill = "Response"
+  ) +
+  theme_minimal()
+
+# Plot2: Simple bar chart for "Hard to Say"
+plot2 <- ggplot(hard_to_say, aes(x = var, y = freq, fill = value)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    title = "Hard to Say",
+    x = "Statements",
+    y = "Percentage",
+    fill = "Response"
+  ) +
+  theme_minimal()
+
+# Plot3: Simple bar chart for "No Response"
+plot3 <- ggplot(no_response, aes(x = var, y = freq, fill = value)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(
+    title = "No Response",
+    x = "Statements",
+    y = "Percentage",
+    fill = "Response"
+  ) +
+  theme_minimal()
+
+# Combine all plots side-by-side
+
+final_plot <- (plot1 + plot2 + plot3) +
+  plot_annotation(
+    title = "Responses to Immigration Questions in New Zealand",
+    subtitle = "Divergent bar chart for Agree/Disagree and separate charts for other responses",
+    caption = "Source: Immigration Survey Data"
+  )+
+  plot_layout(ncol = 2, heights = c(1, 1))
+
+# Display the final combined plot
+final_plot
+```
+
+## 2. Analyse the graph
+
+```{r mtcars, echo = T}
+
+# Create the scatterplot
+ggplot(mtcars, aes(x = wt, y = mpg, color = cyl)) +
+  geom_point(size = 4) +                        # points with size 4
+  geom_text(aes(label = rownames(mtcars))) +    # text labels with car names
+  labs(
+    title = "Scatterplot of Car Weight vs. Fuel Efficiency",
+    x = "Weight (1000 lbs)",                   # Label for x-axis
+    y = "Miles Per Gallon (mpg)",              # Label for y-axis
+    color = "Cylinders"                        # Legend title
+  ) +
+  theme_minimal()   
+```
+
+Analyse graph containing information about various car models from the 1974 Motor Trend US magazine. It includes 32 observations of automobiles with 11 variables that cover aspects like fuel consumption, performance, and design specifications.
+
+### 2.2 Descriptions for variables mpg, wt, and cyl.
+
+-   mpg (Miles Per Gallon): The fuel efficiency of the car, measured in miles that the car can travel per gallon of fuel. Higher values indicate better fuel efficiency.
+-   wt (Weight): The weight of the car in 1000 lbs. Heavier cars tend to have lower fuel efficiency.
+-   cyl (Cylinders): The number of cylinders in the car's engine (commonly 4, 6, or 8), which is an indicator of engine size and performance. Larger numbers typically indicate higher performance but lower fuel efficiency.
+
+### 2.3 Graph Description and Observed Trend
+
+The graph visualizes the relationship between car weight (`wt`) and fuel efficiency (`mpg`), with the number of cylinders (`cyl`) represented by color. Heavier cars generally have lower fuel efficiency, showing a clear negative correlation between weight and miles per gallon. Additionally, cars with more cylinders tend to be heavier and less fuel-efficient, clustering at the lower end of the `mpg` axis.
+
+#### Suggestions
+
+1.  Simplify the graph by reducing overlapping text labels or removing them entirely to improve readability.
+2.  Add a clear title and descriptive axis labels to better communicate the purpose of the graph and the variables being plotted.
