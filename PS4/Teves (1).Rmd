@@ -1,0 +1,99 @@
+---
+title: "Problem Set 4: Plotting maps"
+author: "Joan Claire Teves"
+date: "2024-12-11"
+output: html_document
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraries
+
+```{r library, echo=TRUE, message=FALSE}
+library(sf)
+library(patchwork)
+library(tidyverse)
+library(readr)
+library(RColorBrewer)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(grid)  
+
+
+```
+
+# Read
+
+```{r census , echo=TRUE, message=FALSE}
+census <- read_csv("2023_census_population_change_by_ethnic_group_and_rc_lookup_table.csv")
+nz_gg <- read_sf("2023-census-population-change-by-ethnic-group-and-regional-c.shp")
+
+
+```
+
+# Plots for each ethnic group for their population percent change from 2018-2023
+
+```{r plots, echo=TRUE}
+
+# Plots for each variable
+plot_33 <- ggplot(data = nz_gg) +
+  geom_sf(aes(fill = VAR_1_33)) +
+  theme_void() +
+  scale_fill_distiller(palette = "Spectral", direction = 1) +
+  labs(subtitle = "Middle Eastern/Latin \nAmerican/African",
+       fill = "")
+
+plot_34 <- ggplot(data = nz_gg) +
+  geom_sf(aes(fill = VAR_1_34)) +
+  theme_void() +
+  scale_fill_distiller(palette = "Spectral", direction = 1) +
+  labs(subtitle = "Other Ethnicity",
+       fill = "")
+
+plot_35 <- ggplot(data = nz_gg) +
+  geom_sf(aes(fill = VAR_1_35)) +
+  theme_void() +
+  scale_fill_distiller(palette = "Spectral", direction = 1) +
+  labs(subtitle = "Total",
+       fill = "")
+
+plot_36 <- ggplot(data = nz_gg) +
+  geom_sf(aes(fill = VAR_1_36)) +
+  theme_void() +
+  scale_fill_distiller(palette = "Spectral", direction = 1) +
+  labs(subtitle = "Total stated",
+       fill = "")
+
+plot_37 <- ggplot(data = nz_gg) +
+  geom_sf(aes(fill = VAR_1_37)) +
+  theme_void() +
+  scale_fill_distiller(palette = "Spectral", direction = 1) +
+  labs(subtitle = "European",
+       fill = "")
+
+plot_38 <- ggplot(data = nz_gg) +
+  geom_sf(aes(fill = VAR_1_38)) +
+  theme_void() +
+  scale_fill_distiller(palette = "Spectral", direction = 1) +
+  labs(subtitle = "Māori",
+       fill = "")
+
+title <- textGrob("Ethnicity Population Percent Changes 2013-2018 NZ", 
+                  gp = gpar(fontsize = 16, fontface = "bold"))
+
+caption <- textGrob("source: Stat NZ", 
+                    gp = gpar(fontsize = 10, fontface = "italic"), 
+                    hjust = 1, x = 1)
+
+grid.arrange(
+  title,
+  arrangeGrob(plot_33, plot_34, plot_35, plot_36, plot_37, plot_38, ncol = 3),
+  caption,
+  heights = c(0.1, 0.85, 0.05)  
+)
+
+
+```
