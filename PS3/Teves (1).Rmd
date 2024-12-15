@@ -1,0 +1,87 @@
+---
+title: "Problem Set 3: Plotting a stacked horizontal bar chart with NZ GDP data"
+author: "Joan Claire Teves" 
+output: html_document
+date: "2024-12-4" 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading libraries
+
+```{r library, echo = T, warning=FALSE, message=FALSE}
+# Load libraries
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(patchwork)
+library(maps)
+
+```
+
+# Extracting data
+
+```{r data, echo=T, warning=FALSE, message=FALSE}
+gdp <- read_csv("gdp_by_industry.csv")
+
+gdp_2020 <- gdp %>%
+  filter(Period == 2000.03, 
+         Group == "Gross domestic product, by region and industry", 
+         Series_title_2 %in% c("Total North Island", "Total South Island"))
+
+gdp_plot <- gdp_2020 %>%
+  select(Data_value, UNITS, Series_title_3, Series_title_2)
+
+gdp_plot <- gdp_plot[-c(3, 4, 5, 23, 24, 25, 28, 29, 30, 48, 49, 50), ]
+gdp_plot <- gdp_plot %>%
+  pivot_wider(names_from = Series_title_2, values_from = Data_value) %>%
+  arrange(desc(`Total North Island` + `Total South Island`)) 
+gdp_plot
+```
+
+## Plotting the data
+
+```{r plot_2000, echo=T}
+
+plot_2000 <-ggplot(gdp_plot, aes(y = reorder(Series_title_3, `Total North Island` + `Total South Island`))) +
+  geom_bar(aes(x = `Total North Island`, fill = "North Island"), 
+           stat = "identity", position = "dodge", color = "black", alpha = 0.7) +
+  geom_bar(aes(x = `Total South Island`, fill = "South Island"), 
+           stat = "identity", position = "dodge", color = "black", alpha = 0.7) +
+  scale_fill_manual(values = c("North Island" = "#FF6666", "South Island" = "#87CEEB")) +
+
+  geom_bar(data = gdp_plot %>% filter(Series_title_3 == "Manufacturing"),
+           aes(x = `Total North Island`, y = reorder(Series_title_3, `Total North Island` + `Total South Island`)), 
+           fill = "red", color = "black", stat = "identity") +
+  geom_bar(data = gdp_plot %>% filter(Series_title_3 == "Manufacturing"),
+           aes(x = `Total South Island`, y = reorder(Series_title_3, `Total North Island` + `Total South Island`)), 
+           fill = "blue", color = "black", stat = "identity") +
+  
+  labs(
+    title = "Manufacturing’s Leading Role in NZ GDP (2000)",
+    subtitle = "Comparing Industry Contributions to NZ GDP in dollars by Region",
+    x = "",
+    y = "",
+    fill = "Region",
+    caption = "Source: Stats NZ (2000)"
+  ) +
+  scale_x_continuous(labels = scales::dollar_format(), breaks = seq(0, 15000, by = 1000)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 11),
+    plot.subtitle = element_text(size = 8),
+    axis.text.x = element_text(angle = 60, hjust = 1, size = 7),
+    legend.position = "bottom",
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )
+
+plot_2000
+```
+
+## 
+
+```         
+```
